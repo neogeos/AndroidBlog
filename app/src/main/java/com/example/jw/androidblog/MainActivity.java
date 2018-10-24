@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         mBlogList.setHasFixedSize(true);
         mBlogList.setLayoutManager(layoutManager);
 
+        checkUserExists();
+
     }
 
     @Override
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        checkUserExists();
+
         mAuth.addAuthStateListener(mAuthListener);
 
         FirebaseRecyclerOptions<Blog> options;
@@ -163,6 +165,18 @@ public class MainActivity extends AppCompatActivity {
         public void setImage(Context ctx, final String image){
            final ImageView post_image  = (ImageView) mView.findViewById(R.id.post_image);
             Picasso.get().load(image).into(post_image);
+
+            //Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).into(post_image, new Callback() {
+              //  @Override
+              //  public void onSuccess() {
+              //      Picasso.get().load(image).into(post_image);
+              //  }
+
+              //  @Override
+              //  public void onError(Exception e) {
+              //      Picasso.get().load(image).into(post_image);
+              //  }
+           // });
         }
     }
 

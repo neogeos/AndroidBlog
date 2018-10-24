@@ -1,5 +1,6 @@
 package com.example.jw.androidblog;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.Nullable;
@@ -34,6 +35,8 @@ public class SetupActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private StorageReference mStorageImage;
 
+    private ProgressDialog mProgress;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +45,8 @@ public class SetupActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDataBaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mStorageImage = FirebaseStorage.getInstance().getReference().child("Profile_images");
+
+        mProgress = new ProgressDialog(this);
 
         mSetupImageBtn = (ImageButton) findViewById(R.id.setupImageBtn);
         mNameField = (EditText) findViewById(R.id.setupNameField);
@@ -71,6 +76,10 @@ public class SetupActivity extends AppCompatActivity {
         final String user_Id = mAuth.getCurrentUser().getUid();
 
         if(!TextUtils.isEmpty(name) && mImageUri != null){
+
+            mProgress.setMessage("Finishing setup...");
+            mProgress.show();
+
             StorageReference filepath = mStorageImage.child(mImageUri.getLastPathSegment());
 
             filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -81,6 +90,12 @@ public class SetupActivity extends AppCompatActivity {
 
                     mDataBaseUsers.child(user_Id).child("name").setValue(name);
                     mDataBaseUsers.child(user_Id).child("image").setValue(downloadUri.toString());
+
+                    mProgress.dismiss();
+
+                    Intent mainIntent = new Intent(SetupActivity.this, MainActivity.class);
+                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(mainIntent);
                 }
             });
 

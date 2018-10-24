@@ -44,6 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     private SignInButton mGoogleBtn;
     private ProgressDialog mProgress;
     private GoogleSignInClient mGoogleSignInClient;
+    //private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+
+       // mAuthListener = new FirebaseAuth.AuthStateListener() {
+         //   @Override
+           // public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+         //   }
+       // };
+
         mDataBaseUsers = FirebaseDatabase.getInstance().getReference().child("users");
         mDataBaseUsers.keepSynced(true);
 
@@ -78,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         // Build a GoogleSignInClient with the options specified by gso.
-        //mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         mGoogleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,13 +138,15 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             //updateUI(user);
+                            mProgress.dismiss();
+                            checkUserExists();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
                             //updateUI(null);
                         }
-                        mProgress.show();
+
                         // ...
                     }
                 });
