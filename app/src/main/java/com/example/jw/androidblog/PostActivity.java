@@ -6,12 +6,14 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -70,18 +72,29 @@ public class PostActivity extends AppCompatActivity {
 
         if (!TextUtils.isEmpty(title_val) && !TextUtils.isEmpty(desc_val) && mImageUri != null) {
             mProgress.show();
-            StorageReference filepath = mStorage.child("Blog_Images").child(mImageUri.getLastPathSegment());
+            final StorageReference filepath = mStorage.child("Blog_Images").child(mImageUri.getLastPathSegment());
             filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri downloadUri = taskSnapshot.getUploadSessionUri();
+                public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
 
+                    filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Log.d("URL", uri.toString());
+                            // This is the complete uri, you can store it to realtime database
+
+
+                    //Uri downloadUri = taskSnapshot.getUploadSessionUri();
+                    //Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl();
                     DatabaseReference newPost = mDatabase.push();
                     newPost.child("title").setValue(title_val);
                     newPost.child("desc").setValue(desc_val);
-                    newPost.child("image").setValue(downloadUri.toString());
+                    newPost.child("image").setValue(uri.toString());
                     mProgress.dismiss();
                     startActivity(new Intent(PostActivity.this, MainActivity.class));
+
+                        }
+                    });
                 }
             });
         }

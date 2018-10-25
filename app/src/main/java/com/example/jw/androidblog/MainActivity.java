@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull BlogViewHolder holder, int position, @NonNull Blog model) {
                 holder.setTitle(model.getTitle());
                 holder.setDesc(model.getDesc());
-                holder.setImage(getApplicationContext(), model.getImage());
+                holder.setImage(model.getImage());
             }
 
             @NonNull
@@ -162,21 +163,23 @@ public class MainActivity extends AppCompatActivity {
             post_desc.setText(desc);
         }
 
-        public void setImage(Context ctx, final String image){
-           final ImageView post_image  = (ImageView) mView.findViewById(R.id.post_image);
-            Picasso.get().load(image).into(post_image);
+        public void setImage(final String image){
+           final ImageView post_image  = mView.findViewById(R.id.post_image);
+            //Picasso.get().load(image).into(post_image);
 
-            //Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).into(post_image, new Callback() {
-              //  @Override
-              //  public void onSuccess() {
-              //      Picasso.get().load(image).into(post_image);
-              //  }
+            Picasso.get().load(image).centerCrop().resize(390, 185).into(post_image, new Callback() {
+                @Override
+                public void onSuccess() {
+                    Log.d("TAG", "onSuccess");
+                }
 
-              //  @Override
-              //  public void onError(Exception e) {
-              //      Picasso.get().load(image).into(post_image);
-              //  }
-           // });
+                @Override
+                public void onError(Exception e) {
+                    Log.d("TAG", "image:failure " + image);
+                    Picasso.get().load(image).resize(333, 185).into(post_image);
+                    //Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(post_image);
+                }
+            });
         }
     }
 

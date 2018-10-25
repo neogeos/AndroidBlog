@@ -12,10 +12,11 @@
 
         <ImageView
             android:id="@+id/post_image"
-            android:layout_width="333dp"
+            android:layout_width="390dp"
             android:layout_height="185dp"
             android:adjustViewBounds="true"
             android:cropToPadding="false"
+            android:scaleType="centerCrop"
             app:srcCompat="@mipmap/baseline_add_black_18dp" />
 
         <TextView
