@@ -25,6 +25,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDataBase;
     private DatabaseReference mDataBaseUsers;
     private DatabaseReference mDataBaseLike;
+    private DatabaseReference mDatabaseCurrentUser;
+    private Query mQueryCurrentUser;
     private RecyclerView mBlogList;
     private FirebaseRecyclerAdapter<Blog, BlogViewHolder> mAdapter;
     private FirebaseAuth mAuth;
@@ -61,6 +64,13 @@ public class MainActivity extends AppCompatActivity {
         mDataBase = FirebaseDatabase.getInstance().getReference().child("Blog");
         mDataBaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mDataBaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
+
+
+        String currentUserId = mAuth.getCurrentUser().getUid();
+        mDatabaseCurrentUser =  FirebaseDatabase.getInstance().getReference().child("Blog");
+
+        mQueryCurrentUser = mDatabaseCurrentUser.orderByChild("uid").equalTo(currentUserId);
+
 
         mDataBaseUsers.keepSynced(true);
         mDataBaseLike.keepSynced(true);
@@ -91,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseRecyclerOptions<Blog> options;
         options = new FirebaseRecyclerOptions.Builder<Blog>()
-                .setQuery(mDataBase, Blog.class)
+                .setQuery(mQueryCurrentUser, Blog.class)
                 .build();
 
         mAdapter = new FirebaseRecyclerAdapter<Blog, BlogViewHolder>(
